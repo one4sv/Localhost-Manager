@@ -1,0 +1,287 @@
+﻿<Page x:Class="LocalhostManager.Pages.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource AppBackgroundBrush}"
+      Foreground="{DynamicResource TextBrush}">
+
+    <Grid Margin="24">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{DynamicResource Settings}"
+                       FontSize="28"
+                       FontWeight="Bold"/>
+
+            <Button Grid.Column="1"
+                    Content="{DynamicResource Back}"
+                    Width="50"
+                    Height="40"
+                    FontSize="22"
+                    Click="Back_Click"/>
+
+        </Grid>
+
+        <ScrollViewer Grid.Row="1"
+                      Margin="0,24,0,0"
+                      VerticalScrollBarVisibility="Auto">
+
+            <ScrollViewer.Resources>
+
+                <Style TargetType="ScrollBar"
+                       BasedOn="{StaticResource ThinScrollBar}"/>
+
+            </ScrollViewer.Resources>
+
+            <StackPanel>
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        CornerRadius="14"
+                        Padding="18"
+                        Margin="0,0,0,14">
+
+                    <StackPanel>
+
+                        <TextBlock Text="{DynamicResource General}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="StartWithWindowsCheckBox"
+                                  Content="{DynamicResource StartWithWindows}"
+                                  Margin="0,0,0,12"
+                                  Checked="Setting_Changed"
+                                  Unchecked="Setting_Changed"/>
+
+                        <CheckBox x:Name="MinimizeToTrayCheckBox"
+                                  Content="{DynamicResource MinimizeToTray}"
+                                  Margin="0,0,0,12"
+                                  Checked="Setting_Changed"
+                                  Unchecked="Setting_Changed"/>
+
+                        <CheckBox x:Name="CloseToTrayCheckBox"
+                                  Content="{DynamicResource CloseToTray}"
+                                  Checked="Setting_Changed"
+                                  Unchecked="Setting_Changed"/>
+
+                    </StackPanel>
+
+                </Border>
+
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        CornerRadius="14"
+                        Padding="18"
+                        Margin="0,0,0,14">
+
+                    <StackPanel>
+
+                        <TextBlock Text="{DynamicResource Theme}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,14"/>
+
+                        <RadioButton x:Name="DarkThemeRadioButton"
+                                     Content="{DynamicResource DarkTheme}"
+                                     GroupName="Theme"
+                                     Margin="0,0,0,10"
+                                     Checked="Theme_Changed"/>
+
+                        <RadioButton x:Name="LightThemeRadioButton"
+                                     Content="{DynamicResource LightTheme}"
+                                     GroupName="Theme"
+                                     Checked="Theme_Changed"/>
+
+                    </StackPanel>
+
+                </Border>
+
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        CornerRadius="14"
+                        Padding="18"
+                        Margin="0,0,0,14">
+
+                    <StackPanel>
+
+                        <TextBlock Text="{DynamicResource Language}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,14"/>
+
+                        <RadioButton x:Name="RussianLanguageRadioButton"
+                                     Content="{DynamicResource Russian}"
+                                     GroupName="Language"
+                                     Margin="0,0,0,10"
+                                     Checked="Language_Changed"/>
+
+                        <RadioButton x:Name="EnglishLanguageRadioButton"
+                                     Content="{DynamicResource English}"
+                                     GroupName="Language"
+                                     Checked="Language_Changed"/>
+
+                    </StackPanel>
+
+                </Border>
+
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        CornerRadius="14"
+                        Padding="18"
+                        Margin="0,0,0,14">
+
+                    <StackPanel>
+
+                        <TextBlock Text="{DynamicResource Notifications}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="NotifyOnStartCheckBox"
+                                  Content="{DynamicResource NotifyOnStart}"
+                                  Margin="0,0,0,12"
+                                  Checked="Setting_Changed"
+                                  Unchecked="Setting_Changed"/>
+
+                        <CheckBox x:Name="NotifyOnStopCheckBox"
+                                  Content="{DynamicResource NotifyOnStop}"
+                                  Margin="0,0,0,12"
+                                  Checked="Setting_Changed"
+                                  Unchecked="Setting_Changed"/>
+
+                        <CheckBox x:Name="NotifyOnCrashCheckBox"
+                                  Content="{DynamicResource NotifyOnCrash}"
+                                  Checked="Setting_Changed"
+                                  Unchecked="Setting_Changed"/>
+
+                    </StackPanel>
+
+                </Border>
+
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        CornerRadius="14"
+                        Padding="18"
+                        Margin="0,0,0,14">
+
+                    <StackPanel>
+
+                        <TextBlock Text="{DynamicResource Favorites}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,6"/>
+
+                        <TextBlock Text="{DynamicResource FavoritesDescription}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   Margin="0,0,0,14"
+                                   TextWrapping="Wrap"/>
+
+                        <ComboBox x:Name="FavoriteLocalhost1"
+                                  Height="40"
+                                  Margin="0,0,0,10"
+                                  SelectionChanged="FavoriteLocalhost_Changed"/>
+
+                        <ComboBox x:Name="FavoriteLocalhost2"
+                                  Height="40"
+                                  Margin="0,0,0,10"
+                                  SelectionChanged="FavoriteLocalhost_Changed"/>
+
+                        <ComboBox x:Name="FavoriteLocalhost3"
+                                  Height="40"
+                                  SelectionChanged="FavoriteLocalhost_Changed"/>
+
+                    </StackPanel>
+
+                </Border>
+
+
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        CornerRadius="14"
+                        Padding="18">
+
+                    <StackPanel>
+
+                        <TextBlock Text="{DynamicResource Commands}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,14"/>
+
+                        <Grid Margin="0,0,0,12">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="CommandTextBox"
+                                     Height="40"
+                                     Margin="0,0,8,0"/>
+
+                            <Button Grid.Column="1"
+                                    Content="{DynamicResource Add}"
+                                    Width="100"
+                                    Height="40"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Click="AddCommand_Click"/>
+
+                        </Grid>
+
+                        <ItemsControl x:Name="CommandsListBox">
+
+                            <ItemsControl.ItemTemplate>
+
+                                <DataTemplate>
+
+                                    <Grid Margin="0,0,0,8">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Background="{DynamicResource SurfaceSecondaryBrush}"
+                                                CornerRadius="10"
+                                                Padding="12">
+
+                                            <TextBlock Text="{Binding}"
+                                                       FontFamily="Consolas"/>
+
+                                        </Border>
+
+                                        <Button Grid.Column="1"
+                                                Content="{DynamicResource Delete}"
+                                                Width="82"
+                                                Height="40"
+                                                Margin="8,0,0,0"
+                                                Style="{StaticResource DangerButton}"
+                                                Click="DeleteCommand_Click"
+                                                Tag="{Binding}"/>
+
+                                    </Grid>
+
+                                </DataTemplate>
+
+                            </ItemsControl.ItemTemplate>
+
+                        </ItemsControl>
+
+                    </StackPanel>
+
+                </Border>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</Page>

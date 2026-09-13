@@ -1,0 +1,116 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <sys:String x:Key="AppTitle">Localhost Manager</sys:String>
+    <sys:String x:Key="AppSubtitle">Управление локальными проектами</sys:String>
+
+    <sys:String x:Key="Settings">Настройки</sys:String>
+    <sys:String x:Key="Back">X</sys:String>
+
+    <sys:String x:Key="General">Общие</sys:String>
+
+    <sys:String x:Key="StartWithWindows">Запускать приложение вместе с Windows</sys:String>
+    <sys:String x:Key="MinimizeToTray">Сворачивать в трей при автозапуске</sys:String>
+    <sys:String x:Key="CloseToTray">Закрытие окна отправляет приложение в трей</sys:String>
+
+    <sys:String x:Key="Theme">Тема</sys:String>
+    <sys:String x:Key="DarkTheme">Тёмная</sys:String>
+    <sys:String x:Key="LightTheme">Светлая</sys:String>
+
+    <sys:String x:Key="Language">Язык</sys:String>
+    <sys:String x:Key="Russian">Русский</sys:String>
+    <sys:String x:Key="English">English</sys:String>
+
+    <sys:String x:Key="Notifications">Уведомления</sys:String>
+    <sys:String x:Key="NotifyOnStart">Уведомлять о запуске</sys:String>
+    <sys:String x:Key="NotifyOnStop">Уведомлять об остановке</sys:String>
+    <sys:String x:Key="NotifyOnCrash">Уведомлять о критической ошибке и падении localhost</sys:String>
+
+    <sys:String x:Key="Favorites">Избранные localhost</sys:String>
+    <sys:String x:Key="FavoritesDescription">До трёх localhost будут доступны для быстрого открытия из меню трея.</sys:String>
+    <sys:String x:Key="NotSelected">Не выбрано</sys:String>
+
+    <sys:String x:Key="Commands">Команды запуска</sys:String>
+    <sys:String x:Key="Add">Добавить</sys:String>
+    <sys:String x:Key="Delete">Удалить</sys:String>
+
+    <sys:String x:Key="AddProject">+  Добавить проект</sys:String>
+    <sys:String x:Key="AddLocalhost">+  Добавить localhost</sys:String>
+
+    <sys:String x:Key="Start">Запустить</sys:String>
+    <sys:String x:Key="Stop">Остановить</sys:String>
+    <sys:String x:Key="Restart">Перезапустить</sys:String>
+    <sys:String x:Key="Open">Открыть</sys:String>
+    <sys:String x:Key="Logs">Показать логи</sys:String>
+    <sys:String x:Key="Edit">Изменить</sys:String>
+
+    <sys:String x:Key="Running">● Запущен</sys:String>
+    <sys:String x:Key="Stopped">● Остановлен</sys:String>
+
+    <sys:String x:Key="NewLocalhost">Новый localhost</sys:String>
+    <sys:String x:Key="EditLocalhost">Изменить localhost</sys:String>
+
+    <sys:String x:Key="Name">Название</sys:String>
+    <sys:String x:Key="Description">Описание</sys:String>
+    <sys:String x:Key="Path">Путь</sys:String>
+    <sys:String x:Key="Command">Команда</sys:String>
+    <sys:String x:Key="CustomCommand">Своя команда</sys:String>
+    <sys:String x:Key="SaveCustomCommand">Добавить команду в настройки</sys:String>
+    <sys:String x:Key="Port">Порт</sys:String>
+    <sys:String x:Key="Url">URL</sys:String>
+    <sys:String x:Key="Cancel">Отмена</sys:String>
+    <sys:String x:Key="SelectProjectFolder">Выберите папку проекта</sys:String>
+    <sys:String x:Key="AddYourOwn">Добавить свою...</sys:String>
+    
+    <sys:String x:Key="Error">Ошибка</sys:String>
+    <sys:String x:Key="Warning">Предупреждение</sys:String>
+
+    <sys:String x:Key="ProjectName">Название проекта</sys:String>
+    <sys:String x:Key="ProjectDescription">Описание</sys:String>
+    <sys:String x:Key="Save">Сохранить</sys:String>
+
+    <sys:String x:Key="EnterCommand">Введите свою команду.</sys:String>
+    <sys:String x:Key="EnterLocalhostName">Введите название localhost.</sys:String>
+    <sys:String x:Key="EnterProjectPath">Укажите путь к проекту.</sys:String>
+    <sys:String x:Key="SelectCommand">Выберите команду запуска.</sys:String>
+
+    <sys:String x:Key="StartAll">Запустить все</sys:String>
+    <sys:String x:Key="StopAll">Остановить все</sys:String>
+    <sys:String x:Key="RestartAll">Перезапустить все</sys:String>
+    <sys:String x:Key="Projects">Проекты</sys:String>
+    <sys:String x:Key="Localhosts">Localhosts</sys:String>
+    <sys:String x:Key="FavoritesMenu">Избранное</sys:String>
+    <sys:String x:Key="SettingsMenu">Настройки</sys:String>
+    <sys:String x:Key="Exit">Выход</sys:String>
+    <sys:String x:Key="NoFavorites">Нет избранных localhost</sys:String>
+    <sys:String x:Key="NoLocalhosts">Нет localhost</sys:String>
+    <sys:String x:Key="NoProjects">Нет проектов</sys:String>
+
+    <sys:String x:Key="ProjectStarted">Проект запущен</sys:String>
+    <sys:String x:Key="ProjectStopped">Проект остановлен</sys:String>
+    <sys:String x:Key="LocalhostStarted">Localhost запущен</sys:String>
+    <sys:String x:Key="LocalhostStopped">Localhost остановлен</sys:String>
+
+    <sys:String x:Key="StartError">Ошибка запуска</sys:String>
+    <sys:String x:Key="RestartError">Ошибка перезапуска</sys:String>
+
+    <sys:String x:Key="ProjectsStarted">Проекты запущены</sys:String>
+    <sys:String x:Key="ProjectsStopped">Проекты остановлены</sys:String>
+    <sys:String x:Key="ProjectsRestarted">Проекты перезапущены</sys:String>
+
+    <sys:String x:Key="StartedProjectsCount">Запущено проектов</sys:String>
+    <sys:String x:Key="StoppedProjectsCount">Остановлено проектов</sys:String>
+    <sys:String x:Key="RestartedProjectsCount">Перезапущено проектов</sys:String>
+
+    <sys:String x:Key="CriticalError">Критическая ошибка</sys:String>
+    <sys:String x:Key="LocalhostCrashed">Localhost аварийно завершился</sys:String>
+
+    <sys:String x:Key="CannotOpenLocalhost">Невозможно открыть localhost</sys:String>
+    <sys:String x:Key="NoUrlOrPort">не задан URL или порт</sys:String>
+    <sys:String x:Key="OpenError">Ошибка открытия</sys:String>
+
+    <sys:String x:Key="FailedToChangeProject">Не удалось изменить состояние проекта.</sys:String>
+    <sys:String x:Key="FailedToChangeLocalhost">Не удалось изменить состояние localhost.</sys:String>
+</ResourceDictionary>

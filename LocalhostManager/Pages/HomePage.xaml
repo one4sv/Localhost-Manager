@@ -1,0 +1,97 @@
+﻿<Page x:Class="LocalhostManager.Pages.HomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="clr-namespace:LocalhostManager.Controls"
+      Background="{DynamicResource AppBackgroundBrush}"
+      Foreground="{DynamicResource TextBrush}">
+
+    <Grid Margin="28,24">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+
+        <!-- HEADER -->
+
+        <Grid Grid.Row="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel VerticalAlignment="Center">
+
+                <TextBlock Text="{DynamicResource AppTitle}"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource TextBrush}"/>
+
+                <TextBlock Text="{DynamicResource AppSubtitle}"
+                           FontSize="13"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           Margin="0,4,0,0"/>
+
+            </StackPanel>
+
+            <Button Grid.Column="1"
+                    Content="⚙"
+                    Width="42"
+                    Height="42"
+                    Margin="10,0,10,0"
+                    FontSize="18"
+                    Click="Settings_Click"/>
+
+            <Button Grid.Column="2"
+                    Content="{DynamicResource AddProject}"
+                    Width="160"
+                    Height="42"
+                    Style="{StaticResource PrimaryButton}"
+                    Click="AddProject_Click"/>
+
+        </Grid>
+
+        <controls:ProjectForm x:Name="ProjectForm"
+                              Grid.Row="1"
+                              Visibility="Collapsed"
+                              Margin="0,18,0,0"
+                              ProjectCreated="ProjectForm_ProjectCreated"
+                              Cancelled="ProjectForm_Cancelled"/>
+
+        <!-- PROJECT LIST -->
+
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <ScrollViewer.Resources>
+
+                <Style TargetType="ScrollBar"
+                       BasedOn="{StaticResource ThinScrollBar}"/>
+
+            </ScrollViewer.Resources>
+
+            <ItemsControl ItemsSource="{Binding Projects}">
+
+                <ItemsControl.ItemTemplate>
+
+                    <DataTemplate>
+
+                        <controls:ProjectExpander
+                            Margin="0,9,0,0"/>
+
+                    </DataTemplate>
+
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</Page>

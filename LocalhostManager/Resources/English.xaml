@@ -1,0 +1,117 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <sys:String x:Key="AppTitle">Localhost Manager</sys:String>
+    <sys:String x:Key="AppSubtitle">Local project management</sys:String>
+
+    <sys:String x:Key="Settings">Settings</sys:String>
+    <sys:String x:Key="Back">X</sys:String>
+
+    <sys:String x:Key="General">General</sys:String>
+
+    <sys:String x:Key="StartWithWindows">Start application with Windows</sys:String>
+    <sys:String x:Key="MinimizeToTray">Minimize to tray on startup</sys:String>
+    <sys:String x:Key="CloseToTray">Closing the window sends the application to the tray</sys:String>
+
+    <sys:String x:Key="Theme">Theme</sys:String>
+    <sys:String x:Key="DarkTheme">Dark</sys:String>
+    <sys:String x:Key="LightTheme">Light</sys:String>
+
+    <sys:String x:Key="Language">Language</sys:String>
+    <sys:String x:Key="Russian">Русский</sys:String>
+    <sys:String x:Key="English">English</sys:String>
+
+    <sys:String x:Key="Notifications">Notifications</sys:String>
+    <sys:String x:Key="NotifyOnStart">Notify when started</sys:String>
+    <sys:String x:Key="NotifyOnStop">Notify when stopped</sys:String>
+    <sys:String x:Key="NotifyOnCrash">Notify about critical errors and localhost crashes</sys:String>
+
+    <sys:String x:Key="Favorites">Favorite localhosts</sys:String>
+    <sys:String x:Key="FavoritesDescription">Up to three localhosts will be available for quick access from the tray menu.</sys:String>
+    <sys:String x:Key="NotSelected">Not selected</sys:String>
+
+    <sys:String x:Key="Commands">Startup commands</sys:String>
+    <sys:String x:Key="Add">Add</sys:String>
+    <sys:String x:Key="Delete">Delete</sys:String>
+
+    <sys:String x:Key="AddProject">+  Add project</sys:String>
+    <sys:String x:Key="AddLocalhost">+  Add localhost</sys:String>
+
+    <sys:String x:Key="Start">Start</sys:String>
+    <sys:String x:Key="Stop">Stop</sys:String>
+    <sys:String x:Key="Restart">Restart</sys:String>
+    <sys:String x:Key="Open">Open</sys:String>
+    <sys:String x:Key="Logs">Show logs</sys:String>
+    <sys:String x:Key="Edit">Edit</sys:String>
+
+    <sys:String x:Key="Running">● Running</sys:String>
+    <sys:String x:Key="Stopped">● Stopped</sys:String>
+
+    <sys:String x:Key="NewLocalhost">New localhost</sys:String>
+    <sys:String x:Key="EditLocalhost">Edit localhost</sys:String>
+
+    <sys:String x:Key="Name">Name</sys:String>
+    <sys:String x:Key="Description">Description</sys:String>
+    <sys:String x:Key="Path">Path</sys:String>
+    <sys:String x:Key="Command">Command</sys:String>
+    <sys:String x:Key="CustomCommand">Custom command</sys:String>
+    <sys:String x:Key="SaveCustomCommand">Add command to settings</sys:String>
+    <sys:String x:Key="Port">Port</sys:String>
+    <sys:String x:Key="Url">URL</sys:String>
+    <sys:String x:Key="Cancel">Cancel</sys:String>
+    <sys:String x:Key="SelectProjectFolder">Select project folder</sys:String>
+    <sys:String x:Key="AddYourOwn">Add your own...</sys:String>
+
+    <sys:String x:Key="Error">Error</sys:String>
+    <sys:String x:Key="Warning">Warning</sys:String>
+
+    <sys:String x:Key="ProjectName">Project name</sys:String>
+    <sys:String x:Key="ProjectDescription">Description</sys:String>
+    <sys:String x:Key="Save">Save</sys:String>
+
+    <sys:String x:Key="EnterCommand">Enter your command.</sys:String>
+    <sys:String x:Key="EnterLocalhostName">Enter localhost name.</sys:String>
+    <sys:String x:Key="EnterProjectPath">Specify the project path.</sys:String>
+    <sys:String x:Key="SelectCommand">Select a startup command.</sys:String>
+
+    <sys:String x:Key="StartAll">Start all</sys:String>
+    <sys:String x:Key="StopAll">Stop all</sys:String>
+    <sys:String x:Key="RestartAll">Restart all</sys:String>
+    <sys:String x:Key="Projects">Projects</sys:String>
+    <sys:String x:Key="Localhosts">Localhosts</sys:String>
+    <sys:String x:Key="FavoritesMenu">Favorites</sys:String>
+    <sys:String x:Key="SettingsMenu">Settings</sys:String>
+    <sys:String x:Key="Exit">Exit</sys:String>
+    <sys:String x:Key="NoFavorites">No favorite localhosts</sys:String>
+    <sys:String x:Key="NoLocalhosts">No localhosts</sys:String>
+    <sys:String x:Key="NoProjects">No projects</sys:String>
+
+    <sys:String x:Key="ProjectStarted">Project started</sys:String>
+    <sys:String x:Key="ProjectStopped">Project stopped</sys:String>
+    <sys:String x:Key="LocalhostStarted">Localhost started</sys:String>
+    <sys:String x:Key="LocalhostStopped">Localhost stopped</sys:String>
+
+    <sys:String x:Key="StartError">Start error</sys:String>
+    <sys:String x:Key="RestartError">Restart error</sys:String>
+
+    <sys:String x:Key="ProjectsStarted">Projects started</sys:String>
+    <sys:String x:Key="ProjectsStopped">Projects stopped</sys:String>
+    <sys:String x:Key="ProjectsRestarted">Projects restarted</sys:String>
+
+    <sys:String x:Key="StartedProjectsCount">Projects started</sys:String>
+    <sys:String x:Key="StoppedProjectsCount">Projects stopped</sys:String>
+    <sys:String x:Key="RestartedProjectsCount">Projects restarted</sys:String>
+
+    <sys:String x:Key="CriticalError">Critical error</sys:String>
+    <sys:String x:Key="LocalhostCrashed">Localhost crashed</sys:String>
+
+    <sys:String x:Key="CannotOpenLocalhost">Cannot open localhost</sys:String>
+    <sys:String x:Key="NoUrlOrPort">URL or port is not specified</sys:String>
+    <sys:String x:Key="OpenError">Open error</sys:String>
+
+    <sys:String x:Key="FailedToChangeProject">Failed to change project state.</sys:String>
+    <sys:String x:Key="FailedToChangeLocalhost">Failed to change localhost state.</sys:String>
+
+</ResourceDictionary>
