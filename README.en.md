@@ -1,5 +1,7 @@
 # Localhost Manager
 
+[Русский](README.ru.md) | [English](README.en.md)
+
 Localhost Manager is a Windows desktop application for managing local development projects and localhost services.
 
 ## Features
