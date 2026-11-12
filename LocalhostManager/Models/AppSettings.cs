@@ -21,6 +21,8 @@ namespace LocalhostManager.Models
 
         public bool StartWithWindows { get; set; }
 
+        public bool AutoStartProjects { get; set; }
+
         public bool MinimizeToTray { get; set; }
 
         public bool CloseToTray { get; set; }

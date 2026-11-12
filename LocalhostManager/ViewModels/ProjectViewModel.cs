@@ -15,6 +15,7 @@ namespace LocalhostManager.ViewModels
         private bool _isAddingLocalhost;
 
         public Project Project => _project;
+        public void RefreshDetails() => OnPropertyChanged(string.Empty);
 
         public AddLocalhostViewModel LocalhostForm { get; } = new();
 

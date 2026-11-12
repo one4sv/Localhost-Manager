@@ -106,9 +106,33 @@ namespace LocalhostManager.Controls
             if (dialog.ShowDialog() ==
                 Forms.DialogResult.OK)
             {
-                PathTextBox.Text =
-                    dialog.SelectedPath;
+                PathTextBox.Text = dialog.SelectedPath;
+                if (_editingLocalhost == null) Detect_Click(sender, e);
             }
+        }
+
+        private void Detect_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var detected = Services.ProjectDiscovery.Detect(PathTextBox.Text.Trim());
+                foreach (var command in detected)
+                    if (!CommandComboBox.Items.Contains(command)) CommandComboBox.Items.Insert(0, command);
+                if (detected.Count > 0) CommandComboBox.SelectedItem = detected[0];
+                else MessageBox.Show("Поддерживаемые файлы проекта не найдены. Укажите команду вручную.");
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Не удалось определить команды"); }
+        }
+        private async void CheckPort_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!int.TryParse(PortTextBox.Text, out var port) || port is < 1 or > 65535)
+                    throw new ArgumentException("Укажите порт от 1 до 65535.");
+                var owner = await Services.ServiceDiagnostics.PortOwnerAsync(PortTextBox.Text);
+                MessageBox.Show(owner == null ? "Порт свободен." : "Порт занят: " + owner + "\nИзмените порт или остановите процесс в его приложении.", "Диагностика порта");
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Диагностика порта"); }
         }
 
         private void Add_Click(
@@ -183,8 +207,21 @@ namespace LocalhostManager.Controls
                 return;
             }
 
+            if (!int.TryParse(OrderTextBox.Text, out var order) ||
+                !int.TryParse(TimeoutTextBox.Text, out var timeout) || timeout is < 1 or > 300)
+            { MessageBox.Show("Проверьте порядок запуска и время ожидания (1–300 секунд)."); return; }
+            if (!string.IsNullOrWhiteSpace(port) && (!int.TryParse(port, out var portNumber) || portNumber is < 1 or > 65535))
+            { MessageBox.Show("Порт должен быть от 1 до 65535."); return; }
+            var health = HealthTextBox.Text.Trim();
+            if (health.Length > 0 && (!Uri.TryCreate(health, UriKind.Absolute, out var healthUri) || healthUri.Scheme is not ("http" or "https")))
+            { MessageBox.Show("Укажите HTTP или HTTPS адрес проверки."); return; }
             if (_editingLocalhost != null)
             {
+                _editingLocalhost.StartOrder = order;
+                _editingLocalhost.ReadyTimeoutSeconds = timeout;
+                _editingLocalhost.HealthUrl = health;
+                _editingLocalhost.StopCommand = StopTextBox.Text.Trim();
+                _editingLocalhost.AutoRestart = RestartCheckBox.IsChecked == true;
                 _editingLocalhost.Name =
                     name;
 
@@ -222,7 +259,11 @@ namespace LocalhostManager.Controls
                 new Localhost
                 {
                     Name = name,
-
+                    StartOrder = order,
+                    ReadyTimeoutSeconds = timeout,
+                    HealthUrl = health,
+                    StopCommand = StopTextBox.Text.Trim(),
+                    AutoRestart = RestartCheckBox.IsChecked == true,
                     Description =
                         string.IsNullOrWhiteSpace(description)
                             ? null
@@ -264,8 +305,12 @@ namespace LocalhostManager.Controls
         public void Edit(
             Localhost localhost)
         {
-            _editingLocalhost =
-                localhost;
+            _editingLocalhost = localhost;
+            OrderTextBox.Text = localhost.StartOrder.ToString();
+            TimeoutTextBox.Text = localhost.ReadyTimeoutSeconds.ToString();
+            HealthTextBox.Text = localhost.HealthUrl ?? "";
+            StopTextBox.Text = localhost.StopCommand ?? "";
+            RestartCheckBox.IsChecked = localhost.AutoRestart;
 
             LocalhostTitle.Text =
                 Application.Current
@@ -320,14 +365,19 @@ namespace LocalhostManager.Controls
 
             AddButton.Content =
                 Application.Current
-                    .TryFindResource("Add")
+                    .TryFindResource("Save")
                     ?.ToString()
-                ?? "Добавить";
+                ?? "Сохранить";
         }
 
         public void Clear()
         {
             _editingLocalhost = null;
+            OrderTextBox.Text = "0";
+            TimeoutTextBox.Text = "30";
+            HealthTextBox.Clear();
+            StopTextBox.Clear();
+            RestartCheckBox.IsChecked = false;
 
             LocalhostTitle.Text =
                 Application.Current

@@ -6,15 +6,21 @@
         Height="550"
         MinWidth="600"
         MinHeight="350"
-        Background="#171717"
-        Foreground="White"
+        Background="{DynamicResource AppBackgroundBrush}"
+        Foreground="{DynamicResource TextBrush}"
         WindowStartupLocation="CenterOwner">
 
+    <Window.Resources>
+        <Style x:Key="LogRow" TargetType="ListBoxItem">
+            <EventSetter Event="Loaded" Handler="ColorLogRow"/>
+
+        </Style>
+    </Window.Resources>
     <Grid Margin="18">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -32,17 +38,23 @@
 
         </StackPanel>
 
+        <DockPanel Grid.Row="1" Margin="0,12">
+            <Button DockPanel.Dock="Right" Content="{DynamicResource ExportLog}" Click="Export_Click" Width="85" Margin="6,0"/>
+            <Button DockPanel.Dock="Right" Content="{DynamicResource CopyLog}" Click="Copy_Click" Width="100"/>
+            <CheckBox x:Name="Paused" DockPanel.Dock="Right" Content="{DynamicResource PauseScroll}" VerticalAlignment="Center" Margin="12,0"/>
+            <TextBox x:Name="Search" TextChanged="Search_Changed" ToolTip="{DynamicResource FindLog}"/>
+        </DockPanel>
         <Border Grid.Row="2"
-                Background="#111111"
+                Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="#303030"
                 BorderThickness="1"
                 CornerRadius="12">
 
             <ListBox x:Name="LogsList"
-                     ItemsSource="{Binding Logs}"
+                     SelectionMode="Extended"
                      Background="Transparent"
                      BorderThickness="0"
-                     Foreground="#E5E5E5"
+                     Foreground="{DynamicResource TextBrush}"
                      Padding="12"
                      FontFamily="Consolas"
                      FontSize="13"
@@ -51,7 +63,7 @@
 
                 <ListBox.ItemContainerStyle>
 
-                    <Style TargetType="ListBoxItem">
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource LogRow}">
 
                         <Setter Property="Padding"
                                 Value="0"/>

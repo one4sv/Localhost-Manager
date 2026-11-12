@@ -1,4 +1,4 @@
-﻿using LocalhostManager.Models;
+using LocalhostManager.Models;
 using LocalhostManager.ViewModels;
 using System;
 using System.Diagnostics;
@@ -23,7 +23,13 @@ namespace LocalhostManager.Controls
             InitializeComponent();
         }
 
-        private void StartProject_Click(
+        private void More_Click(object sender, RoutedEventArgs e)
+        {
+            var button = (System.Windows.Controls.Button)sender;
+            button.ContextMenu.PlacementTarget = button;
+            button.ContextMenu.IsOpen = true;
+        }
+        private async void StartProject_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -32,12 +38,12 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.StartProject(Project);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StartProjectAsync(Project));
 
             e.Handled = true;
         }
 
-        private void StopProject_Click(
+        private async void StopProject_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -46,12 +52,12 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.StopProject(Project);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StopProjectAsync(Project));
 
             e.Handled = true;
         }
 
-        private void RestartProject_Click(
+        private async void RestartProject_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -60,7 +66,7 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.RestartProject(Project);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.RestartProjectAsync(Project));
 
             e.Handled = true;
         }
@@ -82,7 +88,7 @@ namespace LocalhostManager.Controls
             e.Handled = true;
         }
 
-        private void DeleteProject_Click(
+        private async void DeleteProject_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -102,7 +108,7 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.RemoveProject(Project);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.RemoveProjectAsync(Project));
 
             e.Handled = true;
         }
@@ -120,6 +126,7 @@ namespace LocalhostManager.Controls
             object sender,
             Project project)
         {
+            Project?.RefreshDetails();
             MainWindow.SaveProjects();
 
             ProjectForm.Visibility = Visibility.Collapsed;
@@ -144,7 +151,7 @@ namespace LocalhostManager.Controls
             Project.IsAddingLocalhost = true;
         }
 
-        private void StartLocalhost_Click(
+        private async void StartLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -158,13 +165,12 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.StartLocalhost(
-                localhost);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StartLocalhostAsync(localhost));
 
             e.Handled = true;
         }
 
-        private void StopLocalhost_Click(
+        private async void StopLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -178,13 +184,12 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.StopLocalhost(
-                localhost);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StopLocalhostAsync(localhost));
 
             e.Handled = true;
         }
 
-        private void RestartLocalhost_Click(
+        private async void RestartLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -198,8 +203,7 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.RestartLocalhost(
-                localhost);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.RestartLocalhostAsync(localhost));
 
             e.Handled = true;
         }
@@ -311,15 +315,16 @@ namespace LocalhostManager.Controls
             LocalhostForm.Edit(localhost.Localhost);
         }
 
-        public void DeleteLocalhost(LocalhostViewModel localhost)
+        public async Task DeleteLocalhost(LocalhostViewModel localhost)
         {
             if (DataContext is not ProjectViewModel project)
             {
                 return;
             }
 
-            MainWindow.ProjectManager.StopLocalhost(localhost);
+            if (!await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StopLocalhostAsync(localhost))) return;
 
+            MainWindow.ProjectManager.Forget(localhost);
             project.RemoveLocalhost(localhost);
 
             MainWindow.SaveProjects();
@@ -335,7 +340,7 @@ namespace LocalhostManager.Controls
             }
 
             project.IsAddingLocalhost = false;
-
+            foreach (var service in project.Localhosts) service.RefreshDetails();
             MainWindow.SaveProjects();
         }
 

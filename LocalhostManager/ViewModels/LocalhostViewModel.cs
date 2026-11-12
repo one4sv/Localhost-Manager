@@ -1,4 +1,4 @@
-﻿using LocalhostManager.Models;
+using LocalhostManager.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -14,9 +14,18 @@ namespace LocalhostManager.ViewModels
         private Process? _process;
 
         public Localhost Localhost => _localhost;
+        private string _status = "Остановлен";
+        public string Status { get => _status; private set { _status = value; OnPropertyChanged(); } }
+        public void SetStatus(string status) => Status = status;
+        public void RefreshDetails() => OnPropertyChanged(string.Empty);
+        public void AddSystemLog(string text) => _pendingLogs.Enqueue($"[{DateTime.Now:HH:mm:ss}] {text}");
 
         public event EventHandler? Crashed;
         private bool _stoppingByUser;
+        public const int MaxLogLines = 2000;
+        private readonly System.Collections.Concurrent.ConcurrentQueue<string> _pendingLogs = new();
+        private readonly System.Windows.Threading.DispatcherTimer _logTimer;
+        private bool _isRunning;
 
         public ObservableCollection<string> Commands { get; }
 
@@ -117,15 +126,15 @@ namespace LocalhostManager.ViewModels
 
         public bool IsRunning
         {
-            get => _localhost.IsRunning;
+            get => _isRunning;
             private set
             {
-                if (_localhost.IsRunning == value)
+                if (_isRunning == value)
                 {
                     return;
                 }
 
-                _localhost.IsRunning = value;
+                _isRunning = value;
                 OnPropertyChanged();
             }
         }
@@ -135,6 +144,12 @@ namespace LocalhostManager.ViewModels
             IEnumerable<string> commands)
         {
             _localhost = localhost;
+            _localhost.IsRunning = false;
+            _logTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            _logTimer.Tick += (_, _) => FlushLogs();
 
             Commands = new ObservableCollection<string>(
                 commands
@@ -144,92 +159,90 @@ namespace LocalhostManager.ViewModels
         public void SetProcess(Process process)
         {
             _process = process;
+            _stoppingByUser = false;
             IsRunning = true;
-
+            Status = "Запускается";
+            _logTimer.Start();
             process.OutputDataReceived += Process_OutputDataReceived;
             process.ErrorDataReceived += Process_ErrorDataReceived;
             process.Exited += Process_Exited;
-
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
+            // A short command may have exited before the handler was attached.
+            if (process.HasExited) Process_Exited(process, EventArgs.Empty);
         }
 
-        private void Process_OutputDataReceived(
-            object sender,
-            DataReceivedEventArgs e)
+        private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            AddLog(e.Data);
+            if (string.IsNullOrEmpty(e.Data)) return;
+            _pendingLogs.Enqueue($"[{DateTime.Now:HH:mm:ss}] {e.Data}");
+            while (_pendingLogs.Count > MaxLogLines) _pendingLogs.TryDequeue(out _);
         }
 
-        private void Process_ErrorDataReceived(
-            object sender,
-            DataReceivedEventArgs e)
+        private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            AddLog(e.Data);
+            if (string.IsNullOrEmpty(e.Data)) return;
+            _pendingLogs.Enqueue($"[{DateTime.Now:HH:mm:ss}] [stderr] {e.Data}");
+            while (_pendingLogs.Count > MaxLogLines) _pendingLogs.TryDequeue(out _);
         }
 
-        private void AddLog(string? text)
+        private void FlushLogs()
         {
-            if (string.IsNullOrEmpty(text))
+            // Bound each UI update even if a service writes continuously.
+            for (var count = 0; count < MaxLogLines && _pendingLogs.TryDequeue(out var line); count++)
             {
-                return;
+                Logs.Add(line);
+                if (Logs.Count > MaxLogLines) Logs.RemoveAt(0);
             }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Logs.Add(text);
-            });
         }
 
-        private void Process_Exited(
-            object? sender,
-            EventArgs e)
+        private void Process_Exited(object? sender, EventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            if (sender is not Process exited) return;
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.HasShutdownStarted) return;
+            dispatcher.BeginInvoke(new Action(() =>
             {
-                var process = _process;
-
-                int? exitCode = null;
-
-                try
-                {
-                    if (process != null)
-                    {
-                        exitCode = process.ExitCode;
-                    }
-                }
-                catch
-                {
-                }
-
-                var crashed =
-                    !_stoppingByUser &&
-                    exitCode.HasValue &&
-                    exitCode.Value != 0;
-
-                IsRunning = false;
-                _process = null;
-
-                _stoppingByUser = false;
-
-                if (crashed)
-                {
-                    Crashed?.Invoke(
-                        this,
-                        EventArgs.Empty);
-                }
-            });
+                // An old process must never clear a replacement process's state.
+                if (!ReferenceEquals(_process, exited)) return;
+                var crashed = !_stoppingByUser && exited.ExitCode != 0;
+                // Drain redirected output on a worker: never block the UI dispatcher.
+                _ = FinishExitedProcessAsync(exited, crashed);
+            }));
         }
 
-        public Process? GetProcess()
+        private async System.Threading.Tasks.Task FinishExitedProcessAsync(Process exited, bool crashed)
         {
-            return _process;
+            try { await System.Threading.Tasks.Task.Run(() => exited.WaitForExit()); }
+            catch (InvalidOperationException) { }
+            if (!ReferenceEquals(_process, exited)) return;
+            SetStopped();
+            if (crashed)
+            {
+                Status = "Ошибка";
+                Crashed?.Invoke(this, EventArgs.Empty);
+            }
         }
+
+        public Process? GetProcess() => _process;
+        public void CancelStopping() => _stoppingByUser = false;
 
         public void SetStopped()
         {
-            IsRunning = false;
+            var process = _process;
             _process = null;
+            if (process != null)
+            {
+                process.Exited -= Process_Exited;
+                process.OutputDataReceived -= Process_OutputDataReceived;
+                process.ErrorDataReceived -= Process_ErrorDataReceived;
+                process.Dispose();
+            }
+            _logTimer.Stop();
+            FlushLogs();
+            _stoppingByUser = false;
+            IsRunning = false;
+            Status = "Остановлен";
         }
 
         public void RefreshCommands(

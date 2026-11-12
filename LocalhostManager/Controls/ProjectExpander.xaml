@@ -5,7 +5,7 @@
 
     <Border Margin="0,0,0,6">
 
-        <Expander x:Name="ProjectExpanderControl">
+        <Expander x:Name="ProjectExpanderControl" IsExpanded="True">
 
             <Expander.Header>
 
@@ -152,13 +152,8 @@
 
                         </Button>
 
-                        <Button Width="82"
-                                Height="36"
-                                Style="{StaticResource DangerButton}"
-                                Click="DeleteProject_Click">
-
-                            <TextBlock Text="{DynamicResource Delete}"/>
-
+                        <Button Width="36" Height="36" Content="⋯" Click="More_Click">
+                            <Button.ContextMenu><ContextMenu><MenuItem Header="{DynamicResource Delete}" Click="DeleteProject_Click"/></ContextMenu></Button.ContextMenu>
                         </Button>
 
                     </StackPanel>

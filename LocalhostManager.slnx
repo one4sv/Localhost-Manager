@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="LocalhostManager/LocalhostManager.csproj" />
+  <Project Path="LocalhostManager.Tests/LocalhostManager.Tests.csproj" />
 </Solution>

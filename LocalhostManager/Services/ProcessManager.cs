@@ -42,6 +42,7 @@ namespace LocalhostManager.Services
                     WorkingDirectory = localhost.Path,
                     UseShellExecute = false,
                     CreateNoWindow = true,
+                    RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
                 },
@@ -59,6 +60,35 @@ namespace LocalhostManager.Services
             return process;
         }
 
+        public async Task StopAsync(Process process, Localhost service)
+        {
+            if (process.HasExited) return;
+            // Services can define their native shutdown command (e.g. a local admin endpoint).
+            if (!string.IsNullOrWhiteSpace(service.StopCommand))
+            {
+                using var shutdown = Process.Start(new ProcessStartInfo("cmd.exe", "/d /c " + service.StopCommand)
+                { WorkingDirectory = service.Path, UseShellExecute = false, CreateNoWindow = true });
+                if (shutdown != null)
+                {
+                    try { await shutdown.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(5)); }
+                    catch (TimeoutException) { shutdown.Kill(true); }
+                }
+            }
+            else
+            {
+                // EOF lets console services that read stdin finish their own cleanup.
+                process.StandardInput.Close();
+                if (!process.HasExited) process.CloseMainWindow();
+            }
+            try { await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(3)); }
+            catch (TimeoutException)
+            {
+                // Console services without a shutdown API cannot receive WM_CLOSE.
+                await Task.Run(() => Stop(process));
+            }
+            catch (InvalidOperationException) { /* Exit handler already released the process. */ }
+        }
+
         public void Stop(Process? process)
         {
             if (process == null)
@@ -66,15 +96,18 @@ namespace LocalhostManager.Services
                 return;
             }
 
-            try
+            if (!process.HasExited)
             {
-                if (!process.HasExited)
+                try
                 {
-                    process.Kill(true);
+                    process.Kill(entireProcessTree: true);
                 }
-            }
-            catch
-            {
+                catch (InvalidOperationException) when (process.HasExited)
+                {
+                    // The process exited between the check and Kill.
+                }
+                if (!process.WaitForExit(5000))
+                    throw new TimeoutException("Процесс не завершился. Перезапуск отменён.");
             }
         }
     }

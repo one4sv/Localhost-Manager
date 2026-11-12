@@ -25,7 +25,7 @@ The latest Windows x64 build is available in [Releases](../../releases).
 
 Download:
 
-`LocalhostManager-v0.1-win-x64.zip`
+`LocalhostManager-v0.2-win-x64.zip`
 
 Extract the archive to a convenient folder and run `LocalhostManager.exe`.
 
@@ -42,14 +42,14 @@ Requirements:
 Clone the repository:
 
 ```bash
-git clone https://github.com/one4sv/LocalhostManager.git
-cd LocalhostManager
+git clone https://github.com/one4sv/Localhost-Manager.git
+cd Localhost-Manager
 ```
 
 Run the application:
 
 ```bash
-dotnet run
+dotnet run --project LocalhostManager/LocalhostManager.csproj
 ```
 
 ## Build
@@ -57,13 +57,13 @@ dotnet run
 For a Release build:
 
 ```bash
-dotnet build -c Release
+dotnet build LocalhostManager/LocalhostManager.csproj -c Release
 ```
 
 To create a self-contained Windows x64 build:
 
 ```bash
-dotnet publish -c Release -r win-x64 --self-contained true
+dotnet publish LocalhostManager/LocalhostManager.csproj -c Release -r win-x64 --self-contained true
 ```
 
 The published files will be available in:
@@ -145,10 +145,42 @@ They are not stored in the GitHub repository and are not included in the publish
 
 Current public version:
 
-`v0.1`
+`v0.2`
 
 This is an early public release. The functionality and interface are still evolving.
 
 ## License
 
 MIT
+
+## Changes after v0.1
+
+Settings → Project startup lets you enable automatic startup and choose projects. It is
+**off by default** and applies once on the next app launch, including Windows sign-in.
+Returning from the tray does not restart projects. Windows startup controls the app only.
+Persisted runtime status is ignored. Automatic startup is skipped after data recovery.
+
+The home screen adds project search and service counts. Restart events cannot clear a
+replacement process; stop errors are reported. Logs retain the latest 2000 lines and
+update in batches. JSON writes are atomic, with `.bak` backups and `.corrupt-<timestamp>`
+copies preserved on recovery.
+
+Run regression checks on Windows:
+
+```powershell
+dotnet run --project LocalhostManager.Tests/LocalhostManager.Tests.csproj -c Release
+```
+
+Tests use isolated temporary data and test processes. UI previews are written to
+`artifacts/screenshots`. Set `LOCALHOST_MANAGER_DATA_DIR` to override the data directory
+for isolated runs; otherwise the app uses `%AppData%/LocalhostManager`.
+
+## Running and diagnosing services
+
+Select a project in the sidebar to see its services and recent output. Open Logs to filter messages, copy selected lines, export the filtered view or pause automatic scrolling. Standard error is marked separately.
+
+Choose a service folder to discover package.json scripts, .NET projects and common Python entry points. Review the suggested command before saving. In advanced settings, choose the startup order (lower numbers first), timeout and an optional HTTP health URL. A port alone enables TCP readiness checks. Without a probe the app reports process state. Project startup waits for each configured probe before starting the next service. Port diagnostics identify the listening process and PID.
+
+A service can provide its own graceful shutdown command. Otherwise the manager closes stdin and requests window closure. After a three-second grace period it terminates the process tree. Optional crash recovery makes up to three attempts after 2, 4 and 6 seconds. Crash history is available in Settings. Launching the manager a second time activates its existing window.
+
+Settings can export project configurations, import additional projects and restore the previous backup. Imported projects get fresh service IDs and automatic startup is disabled. Restoring replaces the list and preserves the original IDs.

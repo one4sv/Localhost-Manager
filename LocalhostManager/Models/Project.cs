@@ -8,6 +8,7 @@ namespace LocalhostManager.Models
 {
     public class Project
     {
+        public bool AutoStart { get; set; }
         public required string Name { get; set; }
         public List<Localhost> Localhosts { get; set; } = [];
         public string? Description { get; set; }

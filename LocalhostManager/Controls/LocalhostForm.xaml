@@ -91,6 +91,23 @@
             <TextBox x:Name="UrlTextBox"
                      Margin="0,0,0,14"/>
 
+            <Button Content="{DynamicResource DetectCommands}" Click="Detect_Click" Margin="0,0,0,12"/>
+            <Expander Header="{DynamicResource ServiceAdvanced}" Margin="0,0,0,14">
+                <StackPanel Margin="12">
+                    <TextBlock Text="{DynamicResource HealthAddress}" TextWrapping="Wrap"/>
+                    <TextBox x:Name="HealthTextBox" Margin="0,6,0,12"/>
+                    <TextBlock Text="{DynamicResource StartupOrder}"/>
+                    <TextBox x:Name="OrderTextBox" Text="0" Margin="0,6,0,12"/>
+                    <TextBlock Text="{DynamicResource ReadyTimeout}"/>
+                    <TextBox x:Name="TimeoutTextBox" Text="30" Margin="0,6,0,12"/>
+                    <TextBlock Text="{DynamicResource StopCommand}"/>
+                    <TextBox x:Name="StopTextBox" Margin="0,6,0,12"/>
+                    <TextBlock Text="{DynamicResource StopHelp}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                    <CheckBox x:Name="RestartCheckBox" Content="{DynamicResource CrashRetry}"/>
+                    <Button Content="{DynamicResource InspectPort}" Click="CheckPort_Click" Margin="0,12,0,0"/>
+                </StackPanel>
+            </Expander>
+
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right">
 

@@ -1,4 +1,5 @@
-﻿using LocalhostManager.ViewModels;
+using System.IO;
+using LocalhostManager.ViewModels;
 using System;
 using System.Linq;
 using System.Windows;
@@ -14,7 +15,7 @@ namespace LocalhostManager.Pages
         private MainWindow MainWindow =>
             (MainWindow)Application.Current.MainWindow;
 
-        private bool _loading;
+        private bool _loading = true;
 
         private sealed class FavoriteOption
         {
@@ -70,6 +71,7 @@ namespace LocalhostManager.Pages
             NotifyOnCrashCheckBox.IsChecked =
                 MainWindow.Settings.NotifyOnCrash;
 
+            AutoStartProjectsCheckBox.IsChecked = MainWindow.Settings.AutoStartProjects;
             LoadFavorites();
             LoadCommands();
 
@@ -179,8 +181,8 @@ namespace LocalhostManager.Pages
 
             var nonEmptyIds =
                 selectedIds
-                    .Where(id =>
-                        !string.IsNullOrWhiteSpace(id))
+                    .OfType<string>()
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
                     .ToList();
 
             if (nonEmptyIds.Count !=
@@ -209,6 +211,38 @@ namespace LocalhostManager.Pages
             CommandsListBox.ItemsSource =
                 MainWindow.Settings.Commands;
         }
+
+        private void StartupProject_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!_loading) MainWindow.SaveProjects();
+        }
+
+        private void ExportProjects_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "JSON|*.json", FileName = "projects.json" };
+            if (dialog.ShowDialog() != true) return;
+            MainWindow.RunServiceAction(() => Services.ProjectArchive.Export(dialog.FileName,
+                MainWindow.Projects.Select(p => p.Project)));
+        }
+        private void ImportProjects_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "JSON|*.json;*.bak" };
+            if (dialog.ShowDialog() == true) MainWindow.RunServiceAction(() => ImportFile(dialog.FileName, false));
+        }
+        private void RestoreProjects_Click(object sender, RoutedEventArgs e) =>
+            MainWindow.RunServiceAction(() => ImportFile(MainWindow.ProjectStorage.BackupPath, true));
+        private void ImportFile(string path, bool restore)
+        {
+            var incoming = Services.ProjectArchive.Read(path, restore);
+            if (restore && MainWindow.Projects.Any(MainWindow.ProjectManager.HasActivity)) throw new InvalidOperationException("Сначала остановите работающие проекты.");
+            if (MessageBox.Show($"{(restore ? "Заменить список проектов резервной копией" : "Добавить проекты из файла")} ({incoming.Count})?", "Проекты",
+                MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+            var result = restore ? incoming : MainWindow.Projects.Select(p => p.Project).Concat(incoming).ToList();
+            MainWindow.ReplaceStoredProjects(result, restore, incoming);
+            MainWindow.NavigateSettings();
+        }
+        private void History_Click(object sender, RoutedEventArgs e) =>
+            MessageBox.Show(MainWindow.ProjectManager.Failures.Count == 0 ? "Сбоев пока нет." : string.Join(Environment.NewLine, MainWindow.ProjectManager.Failures.Take(30)), "История сбоев");
 
         private void Back_Click(
             object sender,
@@ -244,7 +278,9 @@ namespace LocalhostManager.Pages
             MainWindow.Settings.NotifyOnCrash =
                 NotifyOnCrashCheckBox.IsChecked == true;
 
-            MainWindow.UpdateStartupRegistration();
+            MainWindow.Settings.AutoStartProjects = AutoStartProjectsCheckBox.IsChecked == true;
+
+            if (sender == StartWithWindowsCheckBox) MainWindow.UpdateStartupRegistration();
             MainWindow.SaveSettings();
         }
 

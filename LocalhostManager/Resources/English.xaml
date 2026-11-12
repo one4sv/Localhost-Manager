@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
@@ -7,7 +7,7 @@
     <sys:String x:Key="AppSubtitle">Local project management</sys:String>
 
     <sys:String x:Key="Settings">Settings</sys:String>
-    <sys:String x:Key="Back">X</sys:String>
+    <sys:String x:Key="Back">← Back</sys:String>
 
     <sys:String x:Key="General">General</sys:String>
 
@@ -114,4 +114,35 @@
     <sys:String x:Key="FailedToChangeProject">Failed to change project state.</sys:String>
     <sys:String x:Key="FailedToChangeLocalhost">Failed to change localhost state.</sys:String>
 
+    <sys:String x:Key="ProjectStartupTitle">Project startup</sys:String>
+    <sys:String x:Key="AutoStartProjects">Start selected projects when the app opens</sys:String>
+    <sys:String x:Key="AutoStartProjectsHint">Choose projects below. Services start once when the app opens, including Windows sign-in. Automatic startup is off by default.</sys:String>
+    <sys:String x:Key="StartupEmpty">Add a project on the home screen first.</sys:String>
+    <sys:String x:Key="WorkspaceTitle">My projects</sys:String>
+    <sys:String x:Key="WorkspaceHint">Your local services, in one place</sys:String>
+    <sys:String x:Key="EmptyTitle">Your projects belong here</sys:String>
+    <sys:String x:Key="EmptyHint">Add a project, then configure its service commands.</sys:String>
+    <sys:String x:Key="SearchProjects">Search by name or description</sys:String>
+    <sys:String x:Key="NoSearchResults">No matching projects</sys:String>
+    <sys:String x:Key="ProjectsCount">Projects</sys:String>
+    <sys:String x:Key="ServicesCount">Services</sys:String>
+    <sys:String x:Key="RunningCount">Running</sys:String>
+    <sys:String x:Key="SavedAutomatically">Changes are saved automatically</sys:String>
+    <sys:String x:Key="DetectCommands">Detect commands from folder</sys:String>
+    <sys:String x:Key="ServiceAdvanced">Readiness, startup order and recovery</sys:String>
+    <sys:String x:Key="HealthAddress">HTTP health URL (leave empty to check the port)</sys:String>
+    <sys:String x:Key="StartupOrder">Startup order (lower numbers first)</sys:String>
+    <sys:String x:Key="ReadyTimeout">Readiness timeout in seconds (1–300)</sys:String>
+    <sys:String x:Key="StopCommand">Graceful shutdown command (optional)</sys:String>
+    <sys:String x:Key="StopHelp">Without a command, the app closes the input stream and requests window closure. After three seconds it stops the process tree.</sys:String>
+    <sys:String x:Key="CrashRetry">Restart after a crash (up to three attempts)</sys:String>
+    <sys:String x:Key="InspectPort">Identify the process using this port</sys:String>
+    <sys:String x:Key="ExportProjects">Export projects</sys:String>
+    <sys:String x:Key="ImportProjects">Import projects</sys:String>
+    <sys:String x:Key="RestoreBackup">Restore backup</sys:String>
+    <sys:String x:Key="CrashHistory">Crash history</sys:String>
+    <sys:String x:Key="ExportLog">Export</sys:String>
+    <sys:String x:Key="CopyLog">Copy</sys:String>
+    <sys:String x:Key="PauseScroll">Pause scrolling</sys:String>
+    <sys:String x:Key="FindLog">Search logs</sys:String>
 </ResourceDictionary>

@@ -1,4 +1,4 @@
-﻿using LocalhostManager.ViewModels;
+using LocalhostManager.ViewModels;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -18,12 +18,14 @@ namespace LocalhostManager.Controls
         private LocalhostViewModel? Localhost =>
             DataContext as LocalhostViewModel;
 
+        private void Command_Closed(object? sender, EventArgs e) => MainWindow.SaveProjects();
+
         public LocalhostExpander()
         {
             InitializeComponent();
         }
 
-        private void StartLocalhost_Click(
+        private async void StartLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -32,12 +34,12 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.StartLocalhost(Localhost);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StartLocalhostAsync(Localhost));
 
             e.Handled = true;
         }
 
-        private void StopLocalhost_Click(
+        private async void StopLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -46,12 +48,12 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.StopLocalhost(Localhost);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.StopLocalhostAsync(Localhost));
 
             e.Handled = true;
         }
 
-        private void RestartLocalhost_Click(
+        private async void RestartLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -60,7 +62,7 @@ namespace LocalhostManager.Controls
                 return;
             }
 
-            MainWindow.ProjectManager.RestartLocalhost(Localhost);
+            await MainWindow.RunServiceActionAsync(() => MainWindow.ProjectManager.RestartLocalhostAsync(Localhost));
 
             e.Handled = true;
         }
@@ -167,7 +169,7 @@ namespace LocalhostManager.Controls
             e.Handled = true;
         }
 
-        private void DeleteLocalhost_Click(
+        private async void DeleteLocalhost_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -198,7 +200,7 @@ namespace LocalhostManager.Controls
 
             if (parent is ProjectExpander projectExpander)
             {
-                projectExpander.DeleteLocalhost(Localhost);
+                await projectExpander.DeleteLocalhost(Localhost);
             }
 
             e.Handled = true;

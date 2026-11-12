@@ -40,38 +40,11 @@
                             Margin="8,0,0,0"
                             Height="34">
 
-                        <TextBlock FontSize="12"
+                        <TextBlock Text="{Binding Status}" MaxWidth="130" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" FontSize="12"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center">
 
-                            <TextBlock.Style>
 
-                                <Style TargetType="TextBlock">
-
-                                    <Setter Property="Foreground"
-                                            Value="{DynamicResource SecondaryTextBrush}"/>
-
-                                    <Setter Property="Text"
-                                            Value="{DynamicResource Stopped}"/>
-
-                                    <Style.Triggers>
-
-                                        <DataTrigger Binding="{Binding IsRunning}"
-                                                     Value="True">
-
-                                            <Setter Property="Foreground"
-                                                    Value="{DynamicResource PrimaryBrush}"/>
-
-                                            <Setter Property="Text"
-                                                    Value="{DynamicResource Running}"/>
-
-                                        </DataTrigger>
-
-                                    </Style.Triggers>
-
-                                </Style>
-
-                            </TextBlock.Style>
 
                         </TextBlock>
 
@@ -220,7 +193,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <ComboBox Grid.Column="0"
+                    <ComboBox Grid.Column="0" DropDownClosed="Command_Closed"
                               Height="36"
                               ItemsSource="{Binding Commands}"
                               SelectedItem="{Binding Command,

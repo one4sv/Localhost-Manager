@@ -1,4 +1,4 @@
-﻿using LocalhostManager.Models;
+using LocalhostManager.Models;
 using LocalhostManager.Services;
 using LocalhostManager.ViewModels;
 using Microsoft.Win32;
@@ -34,13 +34,16 @@ namespace LocalhostManager
         private readonly FormsNotifyIcon _trayIcon;
         private FormsContextMenuStrip _trayMenu;
 
-        private FormsToolStripMenuItem _projectsMenu;
-        private FormsToolStripMenuItem _localhostsMenu;
-        private FormsToolStripMenuItem _favoritesMenu;
+        private FormsToolStripMenuItem _projectsMenu = null!;
+        private FormsToolStripMenuItem _localhostsMenu = null!;
+        private FormsToolStripMenuItem _favoritesMenu = null!;
 
         private readonly Dictionary<ProjectViewModel, bool> _projectStates = [];
 
+        private readonly StartupProjects _startupProjects = new();
         private bool _isExiting;
+        private bool _shutdownComplete;
+        private bool _shutdownPending;
         private bool _isStartupLaunch;
 
         private Bitmap? _greenDot;
@@ -88,10 +91,18 @@ namespace LocalhostManager
             Loaded += MainWindow_Loaded;
         }
 
-        private void MainWindow_Loaded(
+        private async void MainWindow_Loaded(
             object sender,
             RoutedEventArgs e)
         {
+            foreach (var warning in new[] { SettingsManager.Warning, ProjectStorage.Warning })
+                if (warning != null) MessageBox.Show(warning, "Localhost Manager", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Recovery needs review before any commands are run automatically.
+            if (SettingsManager.Warning == null && ProjectStorage.Warning == null)
+                await _startupProjects.ApplyAsync(Settings, Projects, ProjectManager.StartProjectAsync,
+                    (project, error) => ShowError("StartError", $"Не удалось запустить {project.Name}", error));
+
             if (_isStartupLaunch &&
                 Settings.MinimizeToTray)
             {
@@ -167,27 +178,27 @@ namespace LocalhostManager
                 new FormsToolStripMenuItem(
                     $"▶  {T("StartAll", "Запустить все")}");
 
-            startAllItem.Click += (_, _) =>
+            startAllItem.Click += async (_, _) =>
             {
-                StartAllProjects();
+                await StartAllProjects();
             };
 
             var stopAllItem =
                 new FormsToolStripMenuItem(
                     $"■  {T("StopAll", "Остановить все")}");
 
-            stopAllItem.Click += (_, _) =>
+            stopAllItem.Click += async (_, _) =>
             {
-                StopAllProjects();
+                await StopAllProjects();
             };
 
             var restartAllItem =
                 new FormsToolStripMenuItem(
                     $"↻  {T("RestartAll", "Перезапустить все")}");
 
-            restartAllItem.Click += (_, _) =>
+            restartAllItem.Click += async (_, _) =>
             {
-                RestartAllProjects();
+                await RestartAllProjects();
             };
 
             var openItem =
@@ -221,7 +232,7 @@ namespace LocalhostManager
             {
                 _isExiting = true;
                 _trayIcon.Visible = false;
-                Application.Current.Shutdown();
+                Close();
             };
 
             menu.Items.Add(_projectsMenu);
@@ -276,9 +287,9 @@ namespace LocalhostManager
                     item,
                     project);
 
-                item.Click += (_, _) =>
+                item.Click += async (_, _) =>
                 {
-                    ToggleProject(project);
+                    await ToggleProject(project);
                 };
 
                 _projectsMenu.DropDownItems.Add(
@@ -333,9 +344,9 @@ namespace LocalhostManager
                         localhostItem,
                         localhost);
 
-                    localhostItem.Click += (_, _) =>
+                    localhostItem.Click += async (_, _) =>
                     {
-                        ToggleLocalhost(localhost);
+                        await ToggleLocalhost(localhost);
 
                         UpdateLocalhostMenuItem(
                             localhostItem,
@@ -465,7 +476,7 @@ namespace LocalhostManager
             }
         }
 
-        private void ToggleProject(
+        private async Task ToggleProject(
             ProjectViewModel project)
         {
             try
@@ -475,12 +486,12 @@ namespace LocalhostManager
 
                 if (wasRunning)
                 {
-                    ProjectManager.StopProject(
+                    await ProjectManager.StopProjectAsync(
                         project);
                 }
                 else
                 {
-                    ProjectManager.StartProject(
+                    await ProjectManager.StartProjectAsync(
                         project);
                 }
 
@@ -518,7 +529,7 @@ namespace LocalhostManager
             }
         }
 
-        private void ToggleLocalhost(
+        private async Task ToggleLocalhost(
             LocalhostViewModel localhost)
         {
             try
@@ -528,12 +539,12 @@ namespace LocalhostManager
 
                 if (wasRunning)
                 {
-                    ProjectManager.StopLocalhost(
+                    await ProjectManager.StopLocalhostAsync(
                         localhost);
                 }
                 else
                 {
-                    ProjectManager.StartLocalhost(
+                    await ProjectManager.StartLocalhostAsync(
                         localhost);
                 }
 
@@ -571,20 +582,15 @@ namespace LocalhostManager
             }
         }
 
-        private void StartAllProjects()
+        private async Task StartAllProjects()
         {
             var started = 0;
 
             foreach (var project in Projects)
             {
-                if (project.IsRunning)
-                {
-                    continue;
-                }
-
                 try
                 {
-                    ProjectManager.StartProject(
+                    await ProjectManager.StartProjectAsync(
                         project);
 
                     started++;
@@ -615,7 +621,7 @@ namespace LocalhostManager
             }
         }
 
-        private void StopAllProjects()
+        private async Task StopAllProjects()
         {
             var stopped = 0;
 
@@ -626,10 +632,8 @@ namespace LocalhostManager
                     continue;
                 }
 
-                ProjectManager.StopProject(
-                    project);
-
-                stopped++;
+                if (await RunServiceActionAsync(() => ProjectManager.StopProjectAsync(project)))
+                    stopped++;
             }
 
             RefreshTrayMenus();
@@ -645,7 +649,7 @@ namespace LocalhostManager
             }
         }
 
-        private void RestartAllProjects()
+        private async Task RestartAllProjects()
         {
             var restarted = 0;
 
@@ -653,7 +657,7 @@ namespace LocalhostManager
             {
                 try
                 {
-                    ProjectManager.RestartProject(
+                    await ProjectManager.RestartProjectAsync(
                         project);
 
                     restarted++;
@@ -752,6 +756,18 @@ namespace LocalhostManager
                 title,
                 text,
                 System.Windows.Forms.ToolTipIcon.Info);
+        }
+
+        public async Task<bool> RunServiceActionAsync(Func<Task> action)
+        {
+            try { await action(); return true; }
+            catch (Exception ex) { ShowError("Error", "Ошибка", ex); return false; }
+        }
+
+        public bool RunServiceAction(Action action)
+        {
+            try { action(); return true; }
+            catch (Exception ex) { ShowError("Error", "Ошибка", ex); return false; }
         }
 
         private void ShowError(
@@ -863,6 +879,7 @@ namespace LocalhostManager
             {
                 localhost.Crashed -=
                     Localhost_Crashed;
+                ProjectManager.Forget(localhost);
             }
 
             _projectStates.Remove(project);
@@ -923,6 +940,23 @@ namespace LocalhostManager
             }
         }
 
+        public void ReplaceStoredProjects(List<Project> result, bool restore, List<Project> incoming)
+        {
+            ProjectStorage.Save(result);
+            if (restore)
+            {
+                foreach (var old in Projects.ToArray()) UnsubscribeProject(old);
+                Projects.Clear();
+            }
+            foreach (var model in incoming)
+            {
+                var vm = new ProjectViewModel(model, Settings.Commands);
+                Projects.Add(vm);
+                SubscribeProject(vm);
+            }
+            CleanupFavorites();
+            RefreshTrayMenus();
+        }
         public void AddProject(
             Project project)
         {
@@ -941,11 +975,10 @@ namespace LocalhostManager
             RefreshTrayMenus();
         }
 
-        public void RemoveProject(
+        public async Task RemoveProjectAsync(
             ProjectViewModel project)
         {
-            ProjectManager.StopProject(
-                project);
+            await ProjectManager.StopProjectAsync(project);
 
             var localhostIds =
                 project.Localhosts
@@ -1022,13 +1055,12 @@ namespace LocalhostManager
                         project.Project)
                     .ToList();
 
-            ProjectStorage.Save(projects);
+            RunServiceAction(() => ProjectStorage.Save(projects));
         }
 
         public void SaveSettings()
         {
-            SettingsManager.Save(
-                Settings);
+            RunServiceAction(() => SettingsManager.Save(Settings));
 
             foreach (var project in Projects)
             {
@@ -1078,7 +1110,7 @@ namespace LocalhostManager
             }
         }
 
-        protected override void OnClosing(
+        protected override async void OnClosing(
             System.ComponentModel.CancelEventArgs e)
         {
             if (!_isExiting &&
@@ -1090,8 +1122,18 @@ namespace LocalhostManager
                 return;
             }
 
+            if (!_shutdownComplete)
+            {
+                e.Cancel = true;
+                if (_shutdownPending) return;
+                _shutdownPending = true;
+                foreach (var project in Projects.ToArray())
+                    await RunServiceActionAsync(() => ProjectManager.StopProjectAsync(project));
+                _shutdownComplete = true;
+                _ = Dispatcher.BeginInvoke(new Action(Close));
+                return;
+            }
             _isExiting = true;
-
             base.OnClosing(e);
         }
 
@@ -1105,8 +1147,7 @@ namespace LocalhostManager
                 UnsubscribeProject(
                     project);
 
-                ProjectManager.StopProject(
-                    project);
+                RunServiceAction(() => ProjectManager.StopProject(project));
             }
 
             _trayIcon.Visible = false;
@@ -1138,8 +1179,8 @@ namespace LocalhostManager
         {
             var themePath =
                 Settings.Theme == "light"
-                    ? "Resources/LightTheme.xaml"
-                    : "Resources/DarkTheme.xaml";
+                    ? "/LocalhostManager;component/Resources/LightTheme.xaml"
+                    : "/LocalhostManager;component/Resources/DarkTheme.xaml";
 
             var dictionary =
                 new ResourceDictionary
@@ -1173,8 +1214,8 @@ namespace LocalhostManager
         {
             var languagePath =
                 Settings.Language == "en"
-                    ? "Resources/English.xaml"
-                    : "Resources/Russian.xaml";
+                    ? "/LocalhostManager;component/Resources/English.xaml"
+                    : "/LocalhostManager;component/Resources/Russian.xaml";
 
             var dictionary =
                 new ResourceDictionary
